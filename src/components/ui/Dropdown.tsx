@@ -9,13 +9,20 @@ interface DropdownProps {
   align?: "left" | "right";
 }
 
-export function Dropdown({ trigger, children, align = "right" }: DropdownProps) {
+export function Dropdown({
+  trigger,
+  children,
+  align = "right",
+}: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
@@ -29,12 +36,12 @@ export function Dropdown({ trigger, children, align = "right" }: DropdownProps) 
       <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
         {trigger}
       </div>
-      
+
       {isOpen && (
         <div
           className={cn(
             "absolute top-full mt-2 w-56 rounded-md border bg-popover p-1 shadow-md z-50",
-            align === "right" ? "right-0" : "left-0"
+            align === "right" ? "right-0" : "left-0",
           )}
         >
           {children}
@@ -50,13 +57,17 @@ interface DropdownItemProps {
   className?: string;
 }
 
-export function DropdownItem({ children, onClick, className }: DropdownItemProps) {
+export function DropdownItem({
+  children,
+  onClick,
+  className,
+}: DropdownItemProps) {
   return (
     <div
       onClick={onClick}
       className={cn(
         "flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
-        className
+        className,
       )}
     >
       {children}

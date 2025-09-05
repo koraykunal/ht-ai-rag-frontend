@@ -1,78 +1,84 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from "react"
-import Image from "next/image"
-import { AnimatePresence, motion } from "framer-motion"
-import { Globe, Paperclip, Plus, Send } from "lucide-react"
+import {useCallback, useEffect, useRef, useState} from "react";
+import Image from "next/image";
+import {AnimatePresence, motion} from "framer-motion";
+import {Globe, Paperclip, Plus, Send} from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Textarea } from "@/components/ui/textarea"
+import {cn} from "@/lib/utils";
+import {Textarea} from "@/components/ui/textarea";
 
 interface UseAutoResizeTextareaProps {
-    minHeight: number
-    maxHeight?: number
+    minHeight: number;
+    maxHeight?: number;
 }
 
 function useAutoResizeTextarea({
                                    minHeight,
                                    maxHeight,
                                }: UseAutoResizeTextareaProps) {
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const adjustHeight = useCallback(
         (reset?: boolean) => {
-            const textarea = textareaRef.current
-            if (!textarea) return
+            const textarea = textareaRef.current;
+            if (!textarea) return;
 
             if (reset) {
-                textarea.style.height = `${minHeight}px`
-                return
+                textarea.style.height = `${minHeight}px`;
+                return;
             }
 
-            textarea.style.height = `${minHeight}px`
+            textarea.style.height = `${minHeight}px`;
             const newHeight = Math.max(
                 minHeight,
-                Math.min(textarea.scrollHeight, maxHeight ?? Number.POSITIVE_INFINITY)
-            )
+                Math.min(textarea.scrollHeight, maxHeight ?? Number.POSITIVE_INFINITY),
+            );
 
-            textarea.style.height = `${newHeight}px`
+            textarea.style.height = `${newHeight}px`;
         },
-        [minHeight, maxHeight]
-    )
+        [minHeight, maxHeight],
+    );
 
     useEffect(() => {
-        const textarea = textareaRef.current
+        const textarea = textareaRef.current;
         if (textarea) {
-            textarea.style.height = `${minHeight}px`
+            textarea.style.height = `${minHeight}px`;
         }
-    }, [minHeight])
+    }, [minHeight]);
 
     useEffect(() => {
-        const handleResize = () => adjustHeight()
-        window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize)
-    }, [adjustHeight])
+        const handleResize = () => adjustHeight();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [adjustHeight]);
 
-    return { textareaRef, adjustHeight }
+    return {textareaRef, adjustHeight};
 }
 
-const MIN_HEIGHT = 48
-const MAX_HEIGHT = 164
+const MIN_HEIGHT = 48;
+const MAX_HEIGHT = 164;
 
-const AnimatedPlaceholder = ({ showSearch, placeholder }: { showSearch: boolean; placeholder: string }) => (
+const AnimatedPlaceholder = ({
+                                 showSearch,
+                                 placeholder,
+                             }: {
+    showSearch: boolean;
+    placeholder: string;
+}) => (
     <AnimatePresence mode="wait">
         <motion.p
             key={showSearch ? "search" : "ask"}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.1 }}
-            className="pointer-events-none w-[150px] text-sm absolute text-black/70 dark:text-white/70"
+            initial={{opacity: 0, y: 5}}
+            animate={{opacity: 1, y: 0}}
+            exit={{opacity: 0, y: -5}}
+            transition={{duration: 0.1}}
+            className="pointer-events-none w-[500px] text-sm absolute text-black/70 dark:text-white/70"
         >
-            {showSearch ? "Search the web..." : placeholder}
+            {showSearch ? "Sormak istediğiniz hukuki konuyu veya soruyu buraya yazın. Kaynak referanslarıyla anında cevabınıza ulaşın." : placeholder}
         </motion.p>
     </AnimatePresence>
-)
+);
 
 interface AiInputProps {
     onSendMessage: (message: string) => void;
@@ -80,31 +86,35 @@ interface AiInputProps {
     placeholder?: string;
 }
 
-export function AiInput({ onSendMessage, disabled = false, placeholder = "Ask about Turkish law..." }: AiInputProps) {
-    const [value, setValue] = useState("")
-    const { textareaRef, adjustHeight } = useAutoResizeTextarea({
+export function AiInput({
+                            onSendMessage,
+                            disabled = false,
+                            placeholder = "Ask about Turkish law...",
+                        }: AiInputProps) {
+    const [value, setValue] = useState("");
+    const {textareaRef, adjustHeight} = useAutoResizeTextarea({
         minHeight: MIN_HEIGHT,
         maxHeight: MAX_HEIGHT,
-    })
-    const [showSearch, setShowSearch] = useState(true)
-    const [imagePreview, setImagePreview] = useState<string | null>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
+    });
+    const [showSearch, setShowSearch] = useState(true);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handelClose = (e: any) => {
-        e.preventDefault()
-        e.stopPropagation()
+        e.preventDefault();
+        e.stopPropagation();
         if (fileInputRef.current) {
-            fileInputRef.current.value = ""
+            fileInputRef.current.value = "";
         }
-        setImagePreview(null)
-    }
+        setImagePreview(null);
+    };
 
     const handelChange = (e: any) => {
-        const file = e.target.files ? e.target.files[0] : null
+        const file = e.target.files ? e.target.files[0] : null;
         if (file) {
-            setImagePreview(URL.createObjectURL(file))
+            setImagePreview(URL.createObjectURL(file));
         }
-    }
+    };
 
     const handleSubmit = () => {
         if (value.trim() && !disabled) {
@@ -112,22 +122,22 @@ export function AiInput({ onSendMessage, disabled = false, placeholder = "Ask ab
             setValue("");
             adjustHeight(true);
         }
-    }
+    };
 
     useEffect(() => {
         return () => {
             if (imagePreview) {
-                URL.revokeObjectURL(imagePreview)
+                URL.revokeObjectURL(imagePreview);
             }
-        }
-    }, [imagePreview])
+        };
+    }, [imagePreview]);
     return (
         <div className="w-full py-4">
             <div className="relative max-w-xl border rounded-[22px] border-black/5 p-1 w-full mx-auto">
                 <div className="relative rounded-2xl border border-black/5 bg-neutral-800/5 flex flex-col">
                     <div
                         className="overflow-y-auto"
-                        style={{ maxHeight: `${MAX_HEIGHT}px` }}
+                        style={{maxHeight: `${MAX_HEIGHT}px`}}
                     >
                         <div className="relative">
                             <Textarea
@@ -139,18 +149,26 @@ export function AiInput({ onSendMessage, disabled = false, placeholder = "Ask ab
                                 disabled={disabled}
                                 onKeyDown={(e) => {
                                     if (e.key === "Enter" && !e.shiftKey && !disabled) {
-                                        e.preventDefault()
-                                        handleSubmit()
+                                        e.preventDefault();
+                                        handleSubmit();
+                                    }
+                                    if (e.key === "Escape" && value.trim()) {
+                                        e.preventDefault();
+                                        setValue("");
+                                        adjustHeight(true);
                                     }
                                 }}
                                 onChange={(e) => {
-                                    setValue(e.target.value)
-                                    adjustHeight()
+                                    setValue(e.target.value);
+                                    adjustHeight();
                                 }}
                             />
                             {!value && (
                                 <div className="absolute left-4 top-3">
-                                    <AnimatedPlaceholder showSearch={showSearch} placeholder={placeholder} />
+                                    <AnimatedPlaceholder
+                                        showSearch={showSearch}
+                                        placeholder={placeholder}
+                                    />
                                 </div>
                             )}
                         </div>
@@ -263,16 +281,16 @@ export function AiInput({ onSendMessage, disabled = false, placeholder = "Ask ab
                                     "rounded-full p-2 transition-colors",
                                     value && !disabled
                                         ? "bg-[#ff3f17]/15 text-[#ff3f17] hover:bg-[#ff3f17]/25"
-                                        : "bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white"
+                                        : "bg-black/5 dark:bg-white/5 text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white",
                                 )}
                                 disabled={disabled || !value.trim()}
                             >
-                                <Send className="w-4 h-4" />
+                                <Send className="w-4 h-4"/>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }

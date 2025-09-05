@@ -16,30 +16,74 @@ export function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const { register } = useAuth();
   const { t } = useTranslation();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+  const validateForm = () => {
+    if (!fullName.trim()) {
+      setError("Ad soyad gereklidir");
+      return false;
+    }
 
-    if (password !== confirmPassword) {
-      setError(t("auth.password_mismatch"));
-      setIsLoading(false);
-      return;
+    if (!username.trim()) {
+      setError("Kullanıcı adı gereklidir");
+      return false;
+    }
+
+    if (username.length < 3) {
+      setError("Kullanıcı adı en az 3 karakter olmalıdır");
+      return false;
+    }
+
+    if (!email.trim()) {
+      setError("E-posta adresi gereklidir");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Geçerli bir e-posta adresi giriniz");
+      return false;
+    }
+
+    if (!password.trim()) {
+      setError("Şifre gereklidir");
+      return false;
     }
 
     if (password.length < 6) {
-      setError(t("auth.password_min_length"));
-      setIsLoading(false);
+      setError("Şifre en az 6 karakter olmalıdır");
+      return false;
+    }
+
+    if (!confirmPassword.trim()) {
+      setError("Şifre tekrarı gereklidir");
+      return false;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Şifreler eşleşmiyor");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!validateForm()) {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       await register(email, username, password, fullName);
-    } catch (_err) {
-      setError(t("auth.register_error"));
+    } catch (error: any) {
+      setError(error.message || "Kayıt işlemi başarısız");
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +100,10 @@ export function RegisterForm() {
               type="text"
               placeholder={t("auth.full_name_placeholder")}
               value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) => {
+                setFullName(e.target.value);
+                if (error) setError("");
+              }}
               required
               disabled={isLoading}
               className="h-10"
@@ -70,7 +117,10 @@ export function RegisterForm() {
               type="text"
               placeholder={t("auth.username_placeholder")}
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                if (error) setError("");
+              }}
               required
               disabled={isLoading}
               className="h-10"
@@ -85,7 +135,10 @@ export function RegisterForm() {
             type="email"
             placeholder={t("auth.email_placeholder")}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError("");
+            }}
             required
             disabled={isLoading}
             className="h-10"
@@ -99,7 +152,13 @@ export function RegisterForm() {
             type="password"
             placeholder={t("auth.password_create_placeholder")}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError("");
+              if (confirmPassword) {
+                setPasswordsMatch(e.target.value === confirmPassword);
+              }
+            }}
             required
             disabled={isLoading}
             minLength={6}
@@ -114,12 +173,30 @@ export function RegisterForm() {
             type="password"
             placeholder={t("auth.confirm_password_placeholder")}
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (error) setError("");
+              setPasswordsMatch(password === e.target.value);
+            }}
             required
             disabled={isLoading}
             minLength={6}
-            className="h-10"
+            className={`h-10 ${
+              confirmPassword && !passwordsMatch 
+                ? "border-red-500 focus:border-red-500" 
+                : ""
+            }`}
           />
+          {confirmPassword && !passwordsMatch && (
+            <p className="text-sm text-red-600 mt-1">
+              Şifreler eşleşmiyor
+            </p>
+          )}
+          {confirmPassword && passwordsMatch && password && (
+            <p className="text-sm text-green-600 mt-1">
+              Şifreler eşleşiyor ✓
+            </p>
+          )}
         </div>
       </div>
 
@@ -130,7 +207,11 @@ export function RegisterForm() {
         </div>
       )}
 
-      <Button type="submit" className="w-full h-10" disabled={isLoading}>
+      <Button 
+        type="submit" 
+        className="w-full h-10" 
+        disabled={isLoading || (confirmPassword && !passwordsMatch) || !fullName || !username || !email || !password || !confirmPassword}
+      >
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? t("auth.creating_account") : t("auth.create_account")}
       </Button>

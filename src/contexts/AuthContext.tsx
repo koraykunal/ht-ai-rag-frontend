@@ -9,7 +9,12 @@ import {
   useState,
 } from "react";
 import { authApi } from "@/lib/api";
-import { getAuthToken, setAuthToken, removeAuthToken, checkSecurityContext } from "@/lib/auth-security";
+import {
+  getAuthToken,
+  setAuthToken,
+  removeAuthToken,
+  checkSecurityContext,
+} from "@/lib/auth-security";
 import type { AuthState } from "@/types";
 
 interface AuthContextType extends AuthState {
@@ -37,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       // Check security context on app start
       checkSecurityContext();
-      
+
       const token = getAuthToken(); // Uses secure token retrieval
       if (token) {
         try {
@@ -76,8 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       router.push("/dashboard");
-    } catch (_error) {
-      throw new Error("Login failed");
+    } catch (error: any) {
+      const message = error?.response?.data?.detail || error?.response?.data?.message || "Giriş başarısız";
+      throw new Error(message);
     }
   };
 
@@ -104,8 +110,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       router.push("/dashboard");
-    } catch (_error) {
-      throw new Error("Registration failed");
+    } catch (error: any) {
+      const message = error?.response?.data?.detail || error?.response?.data?.message || "Kayıt işlemi başarısız";
+      throw new Error(message);
     }
   };
 

@@ -16,16 +16,46 @@ export function LoginForm() {
   const { login } = useAuth();
   const { t } = useTranslation();
 
+  const validateForm = () => {
+    if (!email.trim()) {
+      setError("E-posta adresi gereklidir");
+      return false;
+    }
+    
+    if (!password.trim()) {
+      setError("Şifre gereklidir");
+      return false;
+    }
+
+    if (password.length < 6) {
+      setError("Şifre en az 6 karakter olmalıdır");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Geçerli bir e-posta adresi giriniz");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       await login(email, password);
-    } catch (_err) {
-      setError(t("auth.login_error"));
-    } finally {
+    } catch (error: any) {
+      console.log("Login form error:", error);
+      setError(error.message || "Giriş işlemi başarısız");
       setIsLoading(false);
     }
   };
@@ -40,7 +70,10 @@ export function LoginForm() {
             type="email"
             placeholder={t("auth.email_placeholder")}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError("");
+            }}
             required
             disabled={isLoading}
             className="h-10"
@@ -54,7 +87,10 @@ export function LoginForm() {
             type="password"
             placeholder={t("auth.password_placeholder")}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError("");
+            }}
             required
             disabled={isLoading}
             className="h-10"
@@ -69,7 +105,11 @@ export function LoginForm() {
         </div>
       )}
 
-      <Button type="submit" className="w-full h-10" disabled={isLoading}>
+      <Button 
+        type="submit" 
+        className="w-full h-10" 
+        disabled={isLoading || !email.trim() || !password.trim()}
+      >
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {isLoading ? t("auth.signing_in") : t("auth.login")}
       </Button>
