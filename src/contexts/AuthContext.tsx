@@ -94,22 +94,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     full_name: string,
   ) => {
     try {
-      const response = await authApi.register({
+      // Kayıt işlemi
+      await authApi.register({
         email,
         username,
         password,
         full_name,
       });
-      const { user, access_token } = response.data;
-
-      setAuthToken(access_token); // Secure token storage
-      setState({
-        user,
-        isAuthenticated: true,
-        isLoading: false,
-      });
-
-      router.push("/dashboard");
+      
+      // Kayıt başarılı olduktan sonra otomatik login yap
+      await login(email, password);
     } catch (error: any) {
       const message = error?.response?.data?.detail || error?.response?.data?.message || "Kayıt işlemi başarısız";
       throw new Error(message);
