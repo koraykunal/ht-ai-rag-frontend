@@ -20,7 +20,7 @@ export function UserAnalytics() {
         error,
     } = useQuery({
         queryKey: ["userAnalytics"],
-        queryFn: adminApi.getUserAnalytics,
+        queryFn: () => adminApi.getUserAnalytics(),
     });
 
     if (isLoading) {
@@ -65,8 +65,10 @@ export function UserAnalytics() {
     const analytics = analyticsData?.data;
     if (!analytics) return null;
 
-    const formatDate = (dateString: React.Key | null | undefined) => {
-        return new Date(dateString).toLocaleDateString("tr-TR", {
+    const formatDate = (dateValue: string | number | bigint | null | undefined) => {
+        if (dateValue === null || dateValue === undefined) return "";
+        const validDate = typeof dateValue === "bigint" ? Number(dateValue) : dateValue;
+        return new Date(validDate).toLocaleDateString("tr-TR", {
             month: "short",
             day: "numeric",
         });

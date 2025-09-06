@@ -60,7 +60,7 @@ api.interceptors.response.use(
         }
 
         if (process.env.NODE_ENV === "development") {
-            const isAdminEndpoint = error.config?.url?.includes("/admin/") || error.config?.url?.includes("/dashboard/admin/");
+            const isAdminEndpoint = error.config?.url?.includes("/admin/") || error.config?.url?.includes("/api/dashboard/admin/");
             const is404 = error.response?.status === 404;
 
             if (!(isAdminEndpoint && is404)) {
@@ -95,18 +95,18 @@ export const ragApi = {
 
 export const historyApi = {
     getHistory: (params?: { limit?: number; offset?: number }) =>
-        api.get<UserQuery[]>("/dashboard/history", {params}),
+        api.get<UserQuery[]>("/api/dashboard/history", {params}),
 
     getQueryDetail: (queryId: string) =>
-        api.get<UserQuery>(`/dashboard/history/${queryId}`),
+        api.get<UserQuery>(`/api/dashboard/history/${queryId}`),
 
-    getStats: () => api.get<UserStats>("/dashboard/stats"),
+    getStats: () => api.get<UserStats>("/api/dashboard/stats"),
 
     getSessions: (params?: { limit?: number; offset?: number }) =>
-        api.get<ChatSessionResponse[]>("/dashboard/sessions", {params}),
+        api.get<ChatSessionResponse[]>("/api/dashboard/sessions", {params}),
 
     submitFeedback: (request: FeedbackRequest) =>
-        api.post<{ message: string }>("/dashboard/feedback", request),
+        api.post<{ message: string }>("/api/dashboard/feedback", request),
 
     getDashboard: () =>
         api.get<{
@@ -121,7 +121,7 @@ export const historyApi = {
                 success_rate: number;
                 most_used_category: string;
             };
-        }>("/dashboard/"),
+        }>("/api/dashboard/"),
 
     getUsageChart: (params?: { days?: number }) =>
         api.get<{
@@ -129,15 +129,15 @@ export const historyApi = {
                 date: string;
                 queries: number;
             }>;
-        }>("/dashboard/usage-chart", {params}),
+        }>("/api/dashboard/usage-chart", {params}),
 };
 
 export const adminApi = {
     getSystemStats: () =>
-        api.get<SystemStats>("/dashboard/admin/system-stats"),
+        api.get<SystemStats>("/api/dashboard/admin/system-stats"),
 
     getUserAnalytics: (params?: { days?: number }) =>
-        api.get<UserAnalytics>("/dashboard/admin/user-analytics", {params}),
+        api.get<UserAnalytics>("/api/dashboard/admin/user-analytics", {params}),
 
     getAllUsers: (params?: { skip?: number; limit?: number }) =>
         api.get<AdminUser[]>("/auth/admin/users", {params}),

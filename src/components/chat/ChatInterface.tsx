@@ -113,7 +113,7 @@ export function ChatInterface({chatId}: ChatInterfaceProps) {
                         role: "assistant",
                         content: formattedContent || response.data?.short_conclusion || "Yanıt alınamadı",
                         response_data: response.data,
-                        confidence_score: response.data?.confidence_score,
+                        confidence_score: response.data?.confidence,
                         response_time_ms: response.data?.response_time_ms,
                         created_at: new Date().toISOString(),
                     };

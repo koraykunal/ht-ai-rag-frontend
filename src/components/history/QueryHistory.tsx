@@ -7,7 +7,6 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/Button";
 import {chatApi} from "@/lib/api";
 import {useTranslation} from "@/contexts/TranslationContext";
-import type {ChatSessionResponse} from "@/types";
 import {Clock, MessageSquare, ChevronLeft, ChevronRight} from "lucide-react";
 
 interface QueryHistoryProps {

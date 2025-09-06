@@ -16,6 +16,7 @@ import {
     Crown,
     User,
 } from "lucide-react";
+import {Tooltip} from "@/components/ui/tooltip";
 
 export function UserManagement() {
     const {t} = useTranslation();
@@ -219,7 +220,9 @@ export function UserManagement() {
                                             <div className="flex items-center gap-2 mb-1">
                                                 <p className="font-medium">{user.full_name}</p>
                                                 {user.role === "admin" && (
-                                                    <Crown className="h-4 w-4 text-yellow-500" title="Admin"/>
+                                                    <Tooltip>
+                                                        <Crown className="h-4 w-4 text-yellow-500" />
+                                                    </Tooltip>
                                                 )}
                                                 {!user.is_active && (
                                                     <span className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full">

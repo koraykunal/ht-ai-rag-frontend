@@ -19,7 +19,7 @@ interface QueryFeedbackProps {
 export function QueryFeedback({query, onClose}: QueryFeedbackProps) {
     const {t} = useTranslation();
     const [rating, setRating] = useState(query.user_rating || 0);
-    const [feedback, setFeedback] = useState(query.feedback || "");
+    const [feedback, setFeedback] = useState(query.user_feedback || "");
     const queryClient = useQueryClient();
     const router = useRouter();
 
