@@ -52,8 +52,8 @@ export function RegisterForm() {
       return false;
     }
 
-    if (password.length < 6) {
-      setError("Şifre en az 6 karakter olmalıdır");
+    if (password.length < 8) {
+      setError("Şifre en az 8 karakter olmalıdır");
       return false;
     }
 
@@ -161,7 +161,7 @@ export function RegisterForm() {
             }}
             required
             disabled={isLoading}
-            minLength={6}
+            minLength={8}
             className="h-10"
           />
         </div>
@@ -180,7 +180,7 @@ export function RegisterForm() {
             }}
             required
             disabled={isLoading}
-            minLength={6}
+            minLength={8}
             className={`h-10 ${
               confirmPassword && !passwordsMatch 
                 ? "border-red-500 focus:border-red-500" 
